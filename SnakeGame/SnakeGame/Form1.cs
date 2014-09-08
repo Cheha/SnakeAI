@@ -20,6 +20,7 @@ namespace SnakeGame
         private bool right = false;
         private bool up = false;
         private bool down = false;
+        int score = 0;
 
         public Form1()
         {
@@ -29,6 +30,14 @@ namespace SnakeGame
 
         private void Form1_Load(object sender, EventArgs e)
         {
+
+        }
+
+        private void Form1_Paint(object sender, PaintEventArgs e)
+        {
+            paper = e.Graphics;
+            food.DrawFood(paper);
+            snake.DrawSnake(paper);
 
         }
 

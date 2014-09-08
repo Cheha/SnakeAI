@@ -31,6 +31,14 @@ namespace SnakeGame.Classes
             }
         }
 
+        public void DrawSnake(Graphics paper)
+        {
+            foreach (Rectangle rectangle in snakeRectangles)
+            {
+                paper.FillRectangle(brush, rectangle);
+            }
+        }
+
         public void DrawSnake()
         {
             for (int i = snakeRectangles.Length - 1; i > 0; i--)
