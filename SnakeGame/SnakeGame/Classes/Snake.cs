@@ -15,6 +15,9 @@ namespace SnakeGame.Classes
 
         public Rectangle[] SnakeRectangles { get { return snakeRectangles; } }
 
+        public int X { get { return SnakeRectangles[0].X; } }
+        public int Y { get { return SnakeRectangles[0].Y; } }
+
         public Snake()
         {
             snakeRectangles = new Rectangle[3];

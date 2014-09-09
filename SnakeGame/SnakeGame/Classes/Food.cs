@@ -14,6 +14,9 @@ namespace SnakeGame.Classes
 
         public Rectangle foodRectangle;
 
+        public int X { get { return x; } set { x = value; } }
+        public int Y { get { return y; } set { y = value; } }
+
         public Food(Random random)
         {
             x = random.Next(0, 29)*10;

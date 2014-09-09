@@ -22,10 +22,14 @@ namespace SnakeGame
         private bool down = false;
         int score = 0;
 
+        private SnakeAI ai;
+
         public Form1()
         {
             InitializeComponent();
             food = new Food(new Random());
+            ai = new SnakeAI(snake, food, paper);
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -52,6 +56,8 @@ namespace SnakeGame
             if(right)
                 snake.MoveRight();
 
+            
+            ai.MoveAI();
             this.Invalidate();
             Collision();
 
@@ -74,7 +80,7 @@ namespace SnakeGame
                 down = false;
                 up = false;
                 left = false;
-                right = true;
+                right = false;
             }
             if (e.KeyData == Keys.Down && up == false)
             {
