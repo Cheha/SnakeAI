@@ -21,6 +21,7 @@ namespace SnakeGame
         private bool up = false;
         private bool down = false;
         int score = 0;
+        private List<Point> gate;
 
         private SnakeAI ai;
 
@@ -29,37 +30,40 @@ namespace SnakeGame
             InitializeComponent();
             food = new Food(new Random());
             ai = new SnakeAI(snake, food, paper);
+            gate = SnakeAI.FindPath(new Point(snake.SnakeRectangles[0].X, snake.SnakeRectangles[0].Y), new Point(food.X, food.Y));
 
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
+            var form = new Form1();
             paper = e.Graphics;
             food.DrawFood(paper);
             snake.DrawSnake(paper);
 
+
         }
 
         private void timer1_Tick(object sender, EventArgs e)
-        {
-            if(down)
-                snake.MoveDown();
-            if(up)
-                snake.MoveUp();
-            if(left)
-                snake.MoveLeft();
-            if(right)
-                snake.MoveRight();
+        {      
+            //if(down)
+            //    snake.MoveDown();
+            //if(up)
+            //    snake.MoveUp();
+            //if(left)
+            //    snake.MoveLeft();
+            //if(right)
+            //    snake.MoveRight();
+            MoveSnake(gate);
 
             
-            ai.MoveAI();
             this.Invalidate();
-            Collision();
+           // Collision();
+            
 
             for (int i = 0; i < snake.SnakeRectangles.Length; i++)
             {
@@ -67,9 +71,19 @@ namespace SnakeGame
                 {
                     snake.GrowSnake();
                     food.FoodLocation(new Random());
+                    gate = SnakeAI.FindPath(new Point(snake.SnakeRectangles[0].X, snake.SnakeRectangles[0].Y), new Point(food.X, food.Y));
                 }
             }
+            //SnakeCollision();
+        }
 
+        private void MoveSnake(List<Point> path)
+        {
+            var node = path.First();
+            snake.DrawSnake();
+            snake.SnakeRectangles[0].Y = node.Y;
+            snake.SnakeRectangles[0].X = node.X;
+            path.Remove(node);
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -131,6 +145,16 @@ namespace SnakeGame
             }
         }
 
+        // Checks if snake intersects with itself
+        public void SnakeCollision()
+        {
+            for (int i = 1; i < snake.SnakeRectangles.Length - 1; i++)
+            {
+                if (snake.SnakeRectangles[0].IntersectsWith(snake.SnakeRectangles[i])) 
+                    restart();  
+            }
+        }
+
 
         public void restart()
         {
@@ -142,6 +166,6 @@ namespace SnakeGame
             //codesmeshlabel.Text = "CODESMESH";
             snake = new Snake();
         }
-        
+
     }
 }
