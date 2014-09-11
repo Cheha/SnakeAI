@@ -85,7 +85,7 @@ namespace SnakeGame
                 HeuristicEstimatePathLength = GetHeuristicPathLength(start, goal)
             };
             openSet.Add(startNode);
-            BlackSnake(snake, ref closedSet);
+            //BlackSnake(snake, ref closedSet);
             while (openSet.Count > 0)
             {
                 // Из списка точек на рассмотрение выбирается точка с наименьшим F. Обозначим ее X.
@@ -97,7 +97,7 @@ namespace SnakeGame
                 openSet.Remove(currentNode);
                 closedSet.Add(currentNode);
                 // Для каждой из точек, соседних для X (обозначим эту соседнюю точку Y), делаем следующее:.
-                foreach (var neighbourNode in GetNeighbours(currentNode, goal))
+                foreach (var neighbourNode in GetNeighbours(currentNode, goal, snake))
                 {
                     // Если Y уже находится в рассмотренных – пропускаем ее.
                     if (closedSet.Count(node => node.Position == neighbourNode.Position) > 0)
@@ -127,21 +127,21 @@ namespace SnakeGame
             return 1;
         }
 
-        private static void BlackSnake(Snake snake, ref Collection<PathNode> closeSet)
-        {
-            foreach (var pathNode in snake.SnakeRectangles)
-            {
-                closeSet.Add(new PathNode()
-                {
-                    Position = new Point() {X = pathNode.X, Y = pathNode.Y},
-                    CameFrom = null,
-                    PathLengthFromStart = 0,
-                    HeuristicEstimatePathLength = 0
-                });
-            }
-        }
+        //private static void BlackSnake(Snake snake, ref Collection<PathNode> closeSet)
+        //{
+        //    foreach (var pathNode in snake.SnakeRectangles)
+        //    {
+        //        closeSet.Add(new PathNode()
+        //        {
+        //            Position = new Point() { X = pathNode.X, Y = pathNode.Y },
+        //            CameFrom = null,
+        //            PathLengthFromStart = 0,
+        //            HeuristicEstimatePathLength = 0
+        //        });
+        //    }
+        //}
 
-        private static Collection<PathNode> GetNeighbours(PathNode pathNode, Point goal)
+        private static Collection<PathNode> GetNeighbours(PathNode pathNode, Point goal, Snake snake)
         {
             var result = new Collection<PathNode>();
 
@@ -154,6 +154,23 @@ namespace SnakeGame
 
             foreach (var point in neighbourPoints)
             {
+                // Проверяет является точка частью змеи
+                foreach (var snakeRectangle in snake.SnakeRectangles)
+                {
+                    if (point != snakeRectangle.Location)
+                    {
+                        var neighbourNode = new PathNode()
+                        {
+                            Position = point,
+                            CameFrom = pathNode,
+                            PathLengthFromStart = pathNode.PathLengthFromStart +
+                              GetDistanceBetweenNeighbours(),
+                            HeuristicEstimatePathLength = GetHeuristicPathLength(point, goal)
+                        };
+                        result.Add(neighbourNode);
+                    }
+                }
+
                 //------------- Переделать ---------------------------------
                 // Проверяем, что не вышли за границы карты.
                 //if (point.X < 0 || point.X >= field.GetLength(0))
@@ -165,15 +182,7 @@ namespace SnakeGame
                 //    continue;
                 //----------------------------------------------------------
                 // Заполняем данные для точки маршрута.
-                var neighbourNode = new PathNode()
-                {
-                    Position = point,
-                    CameFrom = pathNode,
-                    PathLengthFromStart = pathNode.PathLengthFromStart +
-                      GetDistanceBetweenNeighbours(),
-                    HeuristicEstimatePathLength = GetHeuristicPathLength(point, goal)
-                };
-                result.Add(neighbourNode);
+                
             }
             return result;
         }
