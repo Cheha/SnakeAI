@@ -30,7 +30,7 @@ namespace SnakeGame
             InitializeComponent();
             food = new Food(new Random());
             ai = new SnakeAI(snake, food, paper);
-            gate = SnakeAI.FindPath(new Point(snake.SnakeRectangles[0].X, snake.SnakeRectangles[0].Y), new Point(food.X, food.Y));
+            gate = SnakeAI.FindPath(new Point(snake.SnakeRectangles[0].X, snake.SnakeRectangles[0].Y), new Point(food.X, food.Y), snake);
 
         }
 
@@ -71,7 +71,7 @@ namespace SnakeGame
                 {
                     snake.GrowSnake();
                     food.FoodLocation(new Random());
-                    gate = SnakeAI.FindPath(new Point(snake.SnakeRectangles[0].X, snake.SnakeRectangles[0].Y), new Point(food.X, food.Y));
+                    gate = SnakeAI.FindPath(new Point(snake.SnakeRectangles[0].X, snake.SnakeRectangles[0].Y), new Point(food.X, food.Y), snake);
                 }
             }
             //SnakeCollision();

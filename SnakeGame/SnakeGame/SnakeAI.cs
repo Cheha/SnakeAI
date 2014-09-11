@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms.VisualStyles;
 using SnakeGame.Classes;
 
 namespace SnakeGame
@@ -67,7 +68,7 @@ namespace SnakeGame
             }
         }
 
-        public static List<Point> FindPath(Point start, Point goal)
+        public static List<Point> FindPath(Point start, Point goal, Snake snake)
         {
             // Создается 2 списка вершин – ожидающие рассмотрения и уже рассмотренные. 
             // В ожидающие добавляется точка старта, список рассмотренных пока пуст.
@@ -84,7 +85,7 @@ namespace SnakeGame
                 HeuristicEstimatePathLength = GetHeuristicPathLength(start, goal)
             };
             openSet.Add(startNode);
-
+            BlackSnake(snake, ref closedSet);
             while (openSet.Count > 0)
             {
                 // Из списка точек на рассмотрение выбирается точка с наименьшим F. Обозначим ее X.
@@ -124,6 +125,20 @@ namespace SnakeGame
         private static int GetDistanceBetweenNeighbours()
         {
             return 1;
+        }
+
+        private static void BlackSnake(Snake snake, ref Collection<PathNode> closeSet)
+        {
+            foreach (var pathNode in snake.SnakeRectangles)
+            {
+                closeSet.Add(new PathNode()
+                {
+                    Position = new Point() {X = pathNode.X, Y = pathNode.Y},
+                    CameFrom = null,
+                    PathLengthFromStart = 0,
+                    HeuristicEstimatePathLength = 0
+                });
+            }
         }
 
         private static Collection<PathNode> GetNeighbours(PathNode pathNode, Point goal)
