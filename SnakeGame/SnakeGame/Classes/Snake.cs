@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace SnakeGame.Classes
 {
@@ -50,35 +51,25 @@ namespace SnakeGame.Classes
             }
         }
 
-        public void MoveDown()
-        {
-            DrawSnake();
-            snakeRectangles[0].Y += 10;
-        }
-
-        public void MoveUp()
-        {
-            DrawSnake();
-            snakeRectangles[0].Y -= 10;
-        }
-
-        public void MoveLeft()
-        {
-            DrawSnake();
-            snakeRectangles[0].X -= 10;
-        }
-
-        public void MoveRight()
-        {
-            DrawSnake();
-            snakeRectangles[0].X += 10;
-        }
-
         public void GrowSnake()
         {
             var rec = snakeRectangles.ToList();
             rec.Add(new Rectangle(snakeRectangles[snakeRectangles.Length - 1].X, snakeRectangles[snakeRectangles.Length - 1].Y, width, height));
             snakeRectangles = rec.ToArray();
+        }
+
+        public void MoveSnake(List<Point> path)
+        {
+            this.DrawSnake();
+            var node = path.First();
+            this.SnakeRectangles[0].Y = node.Y;
+            this.SnakeRectangles[0].X = node.X;
+            //for (int i = 1; i < this.SnakeRectangles.Length; i++)
+            //{
+            //    if (this.SnakeRectangles[0].IntersectsWith(this.SnakeRectangles[i]))
+                    
+            //}
+            path.Remove(node);
         }
     }
 }

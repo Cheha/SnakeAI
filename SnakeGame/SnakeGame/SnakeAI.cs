@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using SnakeGame.Classes;
 
@@ -24,51 +25,7 @@ namespace SnakeGame
             _food = food;
         }
 
-        // return values:
-        // 1 - turn up
-        // 2 - turn down
-        // 3 - turn left
-        // 4 - turn right
-        private int FindPath()
-        {
-            if (_snake.X < _food.X)
-                return 4;
-            if (_snake.Y < _food.Y)
-                return 2;
-            if (_snake.X > _food.X)
-                return 3;
-            if (_snake.Y > _food.Y)
-                return 1;
-            return 0;
-        }
-
-        public void MoveAI()
-        {
-            var result = FindPath();
-            switch (result)
-            {
-                // 1 - turn up
-                case 1:
-                    _snake.MoveUp();
-                    break;
-                // 2 - turn down
-                case 2:
-                    _snake.MoveDown();
-                    break;
-                // 3 - turn left
-                case 3:
-                    _snake.MoveLeft();
-                    break;
-                // 4 - turn right
-                case 4:
-                    _snake.MoveRight();
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        public static List<Point> FindPath(Point start, Point goal, Snake snake)
+        public static List<Point> FindPath(Point start, Point goal)
         {
             // Создается 2 списка вершин – ожидающие рассмотрения и уже рассмотренные. 
             // В ожидающие добавляется точка старта, список рассмотренных пока пуст.
@@ -97,7 +54,7 @@ namespace SnakeGame
                 openSet.Remove(currentNode);
                 closedSet.Add(currentNode);
                 // Для каждой из точек, соседних для X (обозначим эту соседнюю точку Y), делаем следующее:.
-                foreach (var neighbourNode in GetNeighbours(currentNode, goal, snake))
+                foreach (var neighbourNode in currentNode.GetNeighbours(goal))
                 {
                     // Если Y уже находится в рассмотренных – пропускаем ее.
                     if (closedSet.Count(node => node.Position == neighbourNode.Position) > 0)
@@ -122,74 +79,34 @@ namespace SnakeGame
             return null;
         }
 
-        private static int GetDistanceBetweenNeighbours()
+        public static void EatFood(Snake snake, Food food, List<Point> path)
         {
-            return 1;
+            for (int i = 0; i < snake.SnakeRectangles.Length; i++)
+            {
+                if (snake.SnakeRectangles[i].IntersectsWith(food.foodRectangle))
+                {
+                    snake.GrowSnake();
+                    food.FoodLocation(new Random());
+                    path = FindPath(new Point(snake.SnakeRectangles[0].X, snake.SnakeRectangles[0].Y), new Point(food.X, food.Y));
+                }
+            }
         }
 
-        //private static void BlackSnake(Snake snake, ref Collection<PathNode> closeSet)
+        //public static bool CheckNode(Snake snake, Point node)
         //{
-        //    foreach (var pathNode in snake.SnakeRectangles)
+        //    if (snake.SnakeRectangles[0].X == node.X && snake.SnakeRectangles[0].X == node.X)
         //    {
-        //        closeSet.Add(new PathNode()
-        //        {
-        //            Position = new Point() { X = pathNode.X, Y = pathNode.Y },
-        //            CameFrom = null,
-        //            PathLengthFromStart = 0,
-        //            HeuristicEstimatePathLength = 0
-        //        });
+        //        MessageBox.Show("Авария");
+        //        return true;
         //    }
+        //    return false;
         //}
 
-        private static Collection<PathNode> GetNeighbours(PathNode pathNode, Point goal, Snake snake)
-        {
-            var result = new Collection<PathNode>();
-
-            // Соседними точками являются соседние по стороне клетки.
-            Point[] neighbourPoints = new Point[4];
-            neighbourPoints[0] = new Point(pathNode.Position.X + 10, pathNode.Position.Y);
-            neighbourPoints[1] = new Point(pathNode.Position.X - 10, pathNode.Position.Y);
-            neighbourPoints[2] = new Point(pathNode.Position.X, pathNode.Position.Y + 10);
-            neighbourPoints[3] = new Point(pathNode.Position.X, pathNode.Position.Y - 10);
-
-            foreach (var point in neighbourPoints)
-            {
-                // Проверяет является точка частью змеи
-                foreach (var snakeRectangle in snake.SnakeRectangles)
-                {
-                    if (point != snakeRectangle.Location)
-                    {
-                        var neighbourNode = new PathNode()
-                        {
-                            Position = point,
-                            CameFrom = pathNode,
-                            PathLengthFromStart = pathNode.PathLengthFromStart +
-                              GetDistanceBetweenNeighbours(),
-                            HeuristicEstimatePathLength = GetHeuristicPathLength(point, goal)
-                        };
-                        result.Add(neighbourNode);
-                    }
-                }
-
-                //------------- Переделать ---------------------------------
-                // Проверяем, что не вышли за границы карты.
-                //if (point.X < 0 || point.X >= field.GetLength(0))
-                //    continue;
-                //if (point.Y < 0 || point.Y >= field.GetLength(1))
-                //    continue;
-                //// Проверяем, что по клетке можно ходить.
-                //if ((field[point.X, point.Y] != 0) && (field[point.X, point.Y] != 1))
-                //    continue;
-                //----------------------------------------------------------
-                // Заполняем данные для точки маршрута.
-                
-            }
-            return result;
-        }
+        
 
         // Функция примерной оценка растояния до цели
         // Для оценки расстояния я использую длину пути без препятствий.
-        private static int GetHeuristicPathLength(Point from, Point to)
+        internal static int GetHeuristicPathLength(Point from, Point to)
         {
             return Math.Abs(from.X - to.X) + Math.Abs(from.Y - to.Y);
         }
